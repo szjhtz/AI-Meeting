@@ -85,6 +85,14 @@ public class InterviewSessionRuntimeRehydrateService {
             if (isRuntimeReady(sessionId, resolvedScope)) {
                 return buildView(loadMode, InterviewRuntimeRestoreSource.CACHE, InterviewRuntimeConfidence.EXACT, false, getRuntimeSnapshot(sessionId));
             }
+            if (lock == null) {
+                log.warn(
+                "Failed to acquire runtime rehydrate lock after waiting, sessionId={}",
+                sessionId);
+
+                return buildView(
+                loadMode, InterviewRuntimeRestoreSource.NONE, InterviewRuntimeConfidence.READ_ONLY, false, getRuntimeSnapshot(sessionId));
+            }
             InterviewSessionRuntimeView rebuilt = rebuildRuntime(sessionId, loadMode, resolvedScope);
             if (rebuilt != null) {
                 return rebuilt;
